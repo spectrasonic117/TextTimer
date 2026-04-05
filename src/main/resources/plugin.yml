@@ -1,0 +1,8 @@
+name: TextTimer
+api: "1.21"
+version: "${version}"
+main: com.spectrasonic.TextTimer.Main
+api-version: "1.21"
+authors: [Spectrasonic]
+depends: [CommandAPI]
+
