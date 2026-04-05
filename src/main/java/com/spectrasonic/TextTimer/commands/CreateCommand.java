@@ -6,6 +6,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.entity.Player;
+import dev.jorel.commandapi.executors.CommandArguments;
 
 // Comando /tt create <id> - Crea un nuevo TextDisplay
 public class CreateCommand {
@@ -15,7 +16,7 @@ public class CreateCommand {
                 .withSubcommand(new CommandAPICommand("create")
                         .withArguments(new StringArgument("id"))
                         .withPermission(CommandPermission.OP)
-                        .executesPlayer((Player player, dev.jorel.commandapi.CommandArguments args) -> {
+                        .executesPlayer((Player player, CommandArguments args) -> {
                             handleCreate(plugin, player, (String) args.get("id"));
                         })
                 )

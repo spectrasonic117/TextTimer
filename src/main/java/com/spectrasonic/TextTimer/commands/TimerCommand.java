@@ -6,29 +6,27 @@ import com.spectrasonic.Utils.MessageUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
-import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.entity.Player;
+import dev.jorel.commandapi.executors.CommandArguments;
 
 // Comando /tt timer <formato> - Inicia un timer en todos los displays
 public class TimerCommand {
 
     // Sugerencias de formato de tiempo
-    private static final String[] TIME_SUGGESTIONS = {"10", "30", "1m", "2m", "1m30s", "5m"};
+    private static final String[] TIME_SUGGESTIONS = { "10", "30", "1m", "2m", "1m30s", "5m" };
 
-    
     public static void register(Main plugin) {
         new CommandAPICommand("tt")
                 .withSubcommand(new CommandAPICommand("timer")
                         .withArguments(new StringArgument("time")
-                                .replaceSuggestions(ArgumentSuggestions.strings(TIME_SUGGESTIONS))
+                                .replaceSuggestions(ArgumentSuggestions.strings(TIME_SUGGESTIONS)))
                         .withPermission(CommandPermission.OP)
-                        .executesPlayer((Player player, dev.jorel.commandapi.CommandArguments args) -> {
+                        .executesPlayer((Player player, CommandArguments args) -> {
                             String timeStr = (String) args.get("time");
                             handleTimer(plugin, player, timeStr);
-                        })
-                )
-                .register(plugin);
+                        }))
+                .register();
     }
 
     private static void handleTimer(Main plugin, Player player, String timeStr) {
@@ -54,7 +52,7 @@ public class TimerCommand {
 
         // Iniciar nuevo timer
         plugin.getTimerManager().startTimer(seconds);
-        
+
         String formatted = TimerManager.formatTime(seconds);
         String msg = plugin.getMessagesManager().getMessage("commands.timer.started");
         MessageUtils.successMessage(player, msg.replace("{prefix}", "").replace("{time}", formatted));

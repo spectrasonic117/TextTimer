@@ -7,6 +7,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import org.bukkit.entity.Player;
+import dev.jorel.commandapi.executors.CommandArguments;
 
 // Comando /tt tphere <id> - Mueve un display a la posición del jugador
 public class TphereCommand {
@@ -16,7 +17,7 @@ public class TphereCommand {
                 .withSubcommand(new CommandAPICommand("tphere")
                         .withArguments(createIdArgument(plugin))
                         .withPermission(CommandPermission.OP)
-                        .executesPlayer((Player player, dev.jorel.commandapi.CommandArguments args) -> {
+                        .executesPlayer((Player player, CommandArguments args) -> {
                             handleTphere(plugin, player, (String) args.get("id"));
                         }))
                 .register(plugin);

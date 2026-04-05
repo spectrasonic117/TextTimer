@@ -6,6 +6,7 @@ import com.spectrasonic.Utils.PluginLogger;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import org.bukkit.command.CommandSender;
+import dev.jorel.commandapi.executors.CommandArguments;
 
 // Comando /tt reload - Recarga config, mensajes y actualiza displays
 public class ReloadCommand {
@@ -14,7 +15,7 @@ public class ReloadCommand {
         new CommandAPICommand("tt")
                 .withSubcommand(new CommandAPICommand("reload")
                         .withPermission(CommandPermission.OP)
-                        .executes((CommandSender sender, dev.jorel.commandapi.CommandArguments args) -> {
+                        .executes((CommandSender sender, CommandArguments args) -> {
                             handleReload(plugin, sender);
                         })
                 )

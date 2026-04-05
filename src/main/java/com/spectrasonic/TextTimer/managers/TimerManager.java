@@ -22,7 +22,9 @@ public class TimerManager {
     private int remainingSeconds;
     private boolean active;
 
-    public TimerManager(Main plugin) {
+    public boolean isActive() { return active; }
+
+public TimerManager(Main plugin) {
         this.plugin = plugin;
     }
 

@@ -7,6 +7,8 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import dev.jorel.commandapi.executors.CommandArguments;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 
 import java.util.HashMap;
@@ -24,9 +26,9 @@ public class EditCommand {
                         .withArguments(new StringArgument("param")
                                 .replaceSuggestions(ArgumentSuggestions.strings(
                                         "move", "billboard", "size", "rotation", "render")))
-                        .withArguments(new dev.jorel.commandapi.arguments.GreedyStringArgument("value"))
+                        .withArguments(new GreedyStringArgument("value"))
                         .withPermission(CommandPermission.OP)
-                        .executesPlayer((Player player, dev.jorel.commandapi.CommandArguments args) -> {
+                        .executesPlayer((Player player, CommandArguments args) -> {
                             String id = (String) args.get("id");
                             String param = (String) args.get("param");
                             String value = (String) args.get("value");
@@ -98,8 +100,8 @@ public class EditCommand {
             sendInvalidValue(plugin, player, "size", value);
             return;
         }
-        float width = dims.getOrDefault("x", 0.0f).floatValue();
-        float height = dims.getOrDefault("y", 0.0f).floatValue();
+        float width = dims.getOrDefault("x", 0.0).floatValue();
+        float height = dims.getOrDefault("y", 0.0).floatValue();
         plugin.getDisplayManager().setSize(id, width, height);
         sendSuccess(plugin, player, id, "size");
     }
@@ -115,8 +117,8 @@ public class EditCommand {
             return;
         }
         // w = yaw, p = pitch
-        float yaw = angles.getOrDefault("w", 0.0f).floatValue();
-        float pitch = angles.getOrDefault("p", 0.0f).floatValue();
+        float yaw = angles.getOrDefault("w", 0.0).floatValue();
+        float pitch = angles.getOrDefault("p", 0.0).floatValue();
         plugin.getDisplayManager().setRotation(id, yaw, pitch);
         sendSuccess(plugin, player, id, "rotation");
     }

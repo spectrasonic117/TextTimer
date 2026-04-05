@@ -21,6 +21,12 @@ public final class Main extends JavaPlugin {
     private MessagesManager messagesManager;
     private DisplayManager displayManager;
     private TimerManager timerManager;
+public ConfigManager getConfigManager() { return configManager; }
+public CommandManager getCommandManager() { return commandManager; }
+public EventManager getEventManager() { return eventManager; }
+public MessagesManager getMessagesManager() { return messagesManager; }
+public DisplayManager getDisplayManager() { return displayManager; }
+public TimerManager getTimerManager() { return timerManager; }
 
     @Override
     public void onEnable() {

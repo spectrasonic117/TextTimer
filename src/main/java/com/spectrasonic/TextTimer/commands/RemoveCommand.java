@@ -7,6 +7,7 @@ import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.entity.Player;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
+import dev.jorel.commandapi.executors.CommandArguments;
 
 // Comando /tt remove <id> - Elimina un TextDisplay
 public class RemoveCommand {
@@ -16,7 +17,7 @@ public class RemoveCommand {
                 .withSubcommand(new CommandAPICommand("remove")
                         .withArguments(createIdArgument(plugin))
                         .withPermission(CommandPermission.OP)
-                        .executesPlayer((Player player, dev.jorel.commandapi.CommandArguments args) -> {
+                        .executesPlayer((Player player, CommandArguments args) -> {
                             handleRemove(plugin, player, (String) args.get("id"));
                         }))
                 .register(plugin);
