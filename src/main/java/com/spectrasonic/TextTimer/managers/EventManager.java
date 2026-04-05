@@ -3,6 +3,7 @@ package com.spectrasonic.TextTimer.managers;
 import com.spectrasonic.TextTimer.Main;
 import lombok.Getter;
 
+// Registro centralizado de eventos del plugin
 @Getter
 public class EventManager {
 
@@ -14,7 +15,6 @@ public class EventManager {
     }
 
     private void registerEvents() {
-        // Register events here
+        // Registrar listeners aquí cuando sea necesario
     }
-
 }

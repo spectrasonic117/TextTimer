@@ -1,0 +1,75 @@
+# ============================================
+# TextTimer - Configuración Principal
+# ============================================
+
+# Versión del formato de configuración (no modificar)
+config-version: 1
+
+# ============================================
+# Configuración por defecto de los Displays
+# ============================================
+default-display:
+  # Formato del texto del timer usando MiniMessage
+  # {timer} se reemplazará con el tiempo formateado (MM:SS o SS)
+  timer-format: "<white>{timer}</white>"
+
+  # Configuración de fondo del display
+  background:
+    # true = usar fondo personalizado, false = fondo por defecto de Minecraft
+    enabled: true
+    # Color del fondo en formato hexadecimal (#RRGGBB)
+    color: "#000000"
+    # Opacidad del fondo (0 = transparente, 255 = opaco)
+    opacity: 128
+
+  # Configuración de visibilidad
+  visibility:
+    # Rango de renderizado en bloques
+    view-range: 16.0
+    # Texto visible a través de bloques
+    see-through: false
+
+  # Configuración de apariencia
+  appearance:
+    # Ancho del display en bloques
+    width: 2.0
+    # Alto del display en bloques
+    height: 0.5
+    # Billboard: FIXED, VERTICAL, HORIZONTAL, CENTER
+    billboard: "CENTER"
+    # Mostrar sombra en el texto
+    shadowed: false
+    # Alineación: LEFT, CENTER, RIGHT
+    alignment: "CENTER"
+    # Ancho de línea antes de salto
+    line-width: 200
+
+# ============================================
+# Configuración del Timer
+# ============================================
+timer:
+  # Sonido al iniciar el timer (nombre del sonido de Bukkit)
+  start-sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+  # Sonido al finalizar el timer
+  end-sound: "ENTITY_WITHER_DEATH"
+  # Texto a mostrar cuando el timer llega a cero
+  end-text: "<red>00:00</red>"
+
+# ============================================
+# Displays registrados (gestionado por el plugin)
+# No modificar manualmente a menos que sea necesario
+# ============================================
+displays: {}
+# Formato de cada display:
+# displays:
+#   mi_timer:
+#     world: "world"
+#     x: 100.0
+#     y: 64.0
+#     z: -50.0
+#     yaw: 0.0
+#     pitch: 0.0
+#     billboard: "CENTER"
+#     width: 2.0
+#     height: 0.5
+#     view-range: 16.0

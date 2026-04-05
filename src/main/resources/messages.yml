@@ -1,0 +1,66 @@
+# ============================================
+# TextTimer - Mensajes del Plugin
+# ============================================
+
+# Prefijo del plugin (se antepone a todos los mensajes)
+prefix: "<dark_gray>[<blue>TextTimer</blue>]</dark_gray> "
+
+# ============================================
+# Mensajes de Comandos
+# ============================================
+commands:
+  create:
+    success: "{prefix}Display '<white>{id}</white>' creado exitosamente."
+    already-exists: "{prefix}El display '<white>{id}</white>' ya existe."
+    invalid-id: "{prefix}El ID no puede estar vacio."
+  remove:
+    success: "{prefix}Display '<white>{id}</white>' eliminado exitosamente."
+    not-found: "{prefix}No se encontro el display '<white>{id}</white>'."
+  reload:
+    success: "{prefix}Configuracion y mensajes recargados. Displays actualizados."
+    error: "{prefix}Error al recargar la configuracion."
+  tphere:
+    success: "{prefix}Display '<white>{id}</white>' movido a tu posicion."
+    not-found: "{prefix}No se encontro el display '<white>{id}</white>'."
+  edit:
+    success: "{prefix}Display '<white>{id}</white>' actualizado: <white>{param}</white>."
+    not-found: "{prefix}No se encontro el display '<white>{id}</white>'."
+    invalid-param: "{prefix}Parametro desconocido: '<white>{param}</white>'."
+    invalid-value: "{prefix}Valor invalido para <white>{param}</white>: '<white>{value}</white>'."
+    move:
+      usage: "{prefix}Uso: /tt edit <id> move <valores> (ej: 3x-6y-3z, 3x, 6y-3.5z)"
+    billboard:
+      usage: "{prefix}Uso: /tt edit <id> billboard <FIXED|VERTICAL|HORIZONTAL|CENTER>"
+    size:
+      usage: "{prefix}Uso: /tt edit <id> size <valores> (ej: 2x1, 3x, 0.5y)"
+    rotation:
+      usage: "{prefix}Uso: /tt edit <id> rotation <valores> (ej: 90w, -10p, 45w-5p)"
+    render:
+      usage: "{prefix}Uso: /tt edit <id> render <rango>"
+  timer:
+    started: "{prefix}Timer iniciado en todos los displays: <white>{time}</white>."
+    finished: "{prefix}Timer finalizado."
+    stopped: "{prefix}Timer detenido."
+    no-displays: "{prefix}No hay displays disponibles. Crea uno con /tt create <id>."
+    invalid-format: "{prefix}Formato invalido. Usa: 30s, 2m, 1m30s."
+
+# ============================================
+# Mensajes de Error Generales
+# ============================================
+errors:
+  no-permission: "{prefix}No tienes permiso para ejecutar este comando."
+  player-only: "{prefix}Este comando solo puede ser ejecutado por un jugador."
+  internal-error: "{prefix}Error interno del plugin."
+
+# ============================================
+# Mensajes de Ayuda
+# ============================================
+help:
+  header: "<gold>=== Comandos de TextTimer ===</gold>"
+  create: "<aqua>/tt create <id></aqua> - Crea un nuevo display."
+  remove: "<aqua>/tt remove <id></aqua> - Elimina un display."
+  tphere: "<aqua>/tt tphere <id></aqua> - Mueve el display a tu posicion."
+  edit: "<aqua>/tt edit <id> <param> <valor></aqua> - Edita un display."
+  timer: "<aqua>/tt timer <formato></aqua> - Inicia un timer (ej: 1m30s)."
+  reload: "<aqua>/tt reload</aqua> - Recarga la configuracion."
+  help: "<aqua>/tt help</aqua> - Muestra esta ayuda."
