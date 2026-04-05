@@ -2,14 +2,10 @@ package com.spectrasonic.TextTimer.commands;
 
 import com.spectrasonic.TextTimer.Main;
 import com.spectrasonic.Utils.MessageUtils;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandPermission;
+
 import dev.jorel.commandapi.arguments.StringArgument;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import dev.jorel.commandapi.executors.CommandArguments;
-import dev.jorel.commandapi.arguments.GreedyStringArgument;
-import dev.jorel.commandapi.arguments.ArgumentSuggestions;
+import org.bukkit.command.CommandSender;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,25 +15,8 @@ import java.util.regex.Pattern;
 // Comando /tt edit <id> <param> <value> - Edita parámetros de un display
 public class EditCommand {
 
-    public static void register(Main plugin) {
-        new CommandAPICommand("tt")
-                .withSubcommand(new CommandAPICommand("edit")
-                        .withArguments(createIdArgument(plugin))
-                        .withArguments(new StringArgument("param")
-                                .replaceSuggestions(ArgumentSuggestions.strings(
-                                        "move", "billboard", "size", "rotation", "render")))
-                        .withArguments(new GreedyStringArgument("value"))
-                        .withPermission(CommandPermission.OP)
-                        .executesPlayer((Player player, CommandArguments args) -> {
-                            String id = (String) args.get("id");
-                            String param = (String) args.get("param");
-                            String value = (String) args.get("value");
-                            handleEdit(plugin, player, id, param, value);
-                        }))
-                .register(plugin);
-    }
-
-    private static void handleEdit(Main plugin, Player player, String id, String param, String value) {
+    // Registro del subcomando se realiza en TextTimerCommand
+    static void handleEdit(Main plugin, Player player, String id, String param, String value) {
         if (!plugin.getDisplayManager().hasDisplay(id)) {
             sendNotFound(plugin, player, id);
             return;
@@ -153,7 +132,7 @@ public class EditCommand {
     }
 
     // Argumento con sugerencias de IDs existentes
-    private static StringArgument createIdArgument(Main plugin) {
+    static StringArgument createIdArgument(Main plugin) {
         return (StringArgument) new StringArgument("id")
                 .replaceSuggestions(dev.jorel.commandapi.arguments.ArgumentSuggestions.strings(
                         info -> plugin.getDisplayManager().getDisplayIds().toArray(new String[0])));

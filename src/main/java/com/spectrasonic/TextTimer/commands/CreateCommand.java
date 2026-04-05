@@ -2,28 +2,14 @@ package com.spectrasonic.TextTimer.commands;
 
 import com.spectrasonic.TextTimer.Main;
 import com.spectrasonic.Utils.MessageUtils;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandPermission;
-import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.entity.Player;
-import dev.jorel.commandapi.executors.CommandArguments;
+
 
 // Comando /tt create <id> - Crea un nuevo TextDisplay
 public class CreateCommand {
 
-    public static void register(Main plugin) {
-        new CommandAPICommand("tt")
-                .withSubcommand(new CommandAPICommand("create")
-                        .withArguments(new StringArgument("id"))
-                        .withPermission(CommandPermission.OP)
-                        .executesPlayer((Player player, CommandArguments args) -> {
-                            handleCreate(plugin, player, (String) args.get("id"));
-                        })
-                )
-                .register(plugin);
-    }
-
-    private static void handleCreate(Main plugin, Player player, String id) {
+    // Registro del subcomando se realiza en TextTimerCommand
+    static void handleCreate(Main plugin, Player player, String id) {
         // Validar ID
         if (id == null || id.trim().isEmpty()) {
             String msg = plugin.getMessagesManager().getMessage("commands.create.invalid-id");

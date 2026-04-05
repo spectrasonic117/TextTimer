@@ -3,26 +3,14 @@ package com.spectrasonic.TextTimer.commands;
 import com.spectrasonic.TextTimer.Main;
 import com.spectrasonic.Utils.MessageUtils;
 import com.spectrasonic.Utils.PluginLogger;
-import dev.jorel.commandapi.CommandAPICommand;
-import dev.jorel.commandapi.CommandPermission;
 import org.bukkit.command.CommandSender;
-import dev.jorel.commandapi.executors.CommandArguments;
+
 
 // Comando /tt reload - Recarga config, mensajes y actualiza displays
 public class ReloadCommand {
 
-    public static void register(Main plugin) {
-        new CommandAPICommand("tt")
-                .withSubcommand(new CommandAPICommand("reload")
-                        .withPermission(CommandPermission.OP)
-                        .executes((CommandSender sender, CommandArguments args) -> {
-                            handleReload(plugin, sender);
-                        })
-                )
-                .register(plugin);
-    }
-
-    private static void handleReload(Main plugin, CommandSender sender) {
+    // Registro del subcomando se realiza en TextTimerCommand
+    static void handleReload(Main plugin, CommandSender sender) {
         try {
             // Recargar configuración
             plugin.getConfigManager().loadConfig();
