@@ -108,19 +108,19 @@ public class ConfigManager {
     // Carga los datos de un display desde la configuración
     public TextDisplayData getDisplayData(String id) {
         String base = "displays." + id;
-        return TextDisplayData.builder()
-                .id(id)
-                .world(config.getString(base + ".world", "world"))
-                .x(config.getDouble(base + ".x", 0))
-                .y(config.getDouble(base + ".y", 64))
-                .z(config.getDouble(base + ".z", 0))
-                .yaw((float) config.getDouble(base + ".yaw", 0))
-                .pitch((float) config.getDouble(base + ".pitch", 0))
-                .billboard(config.getString(base + ".billboard", getDefaultBillboard()))
-                .width((float) config.getDouble(base + ".width", getDefaultWidth()))
-                .height((float) config.getDouble(base + ".height", getDefaultHeight()))
-                .viewRange((float) config.getDouble(base + ".view-range", getDefaultViewRange()))
-                .build();
+        return new TextDisplayData(
+                id,
+                config.getString(base + ".world", "world"),
+                config.getDouble(base + ".x", 0),
+                config.getDouble(base + ".y", 64),
+                config.getDouble(base + ".z", 0),
+                (float) config.getDouble(base + ".yaw", 0),
+                (float) config.getDouble(base + ".pitch", 0),
+                config.getString(base + ".billboard", getDefaultBillboard()),
+                (float) config.getDouble(base + ".width", getDefaultWidth()),
+                (float) config.getDouble(base + ".height", getDefaultHeight()),
+                (float) config.getDouble(base + ".view-range", getDefaultViewRange())
+        );
     }
 
     // Guarda los datos de un display en la configuración

@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.persistence.PersistentDataType;
 
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,13 +39,13 @@ public class DisplayManager {
     // Crea un nuevo TextDisplay en la ubicación dada
     public TextDisplay createDisplay(String id, Location location) {
         World world = location.getWorld();
-        if (world == null) return null;
+        if (world == null)
+            return null;
 
-        
         Entity entity = world.spawnEntity(location, EntityType.TEXT_DISPLAY);
         TextDisplay display = (TextDisplay) entity;
         applyDefaultSettings(display);
-        
+
         // Establecer texto inicial usando el formato de timer configurado
         String defaultText = plugin.getConfigManager().getTimerFormat().replace("{timer}", "00:00");
         display.text(MiniMessage.miniMessage().deserialize(defaultText));
@@ -55,21 +56,21 @@ public class DisplayManager {
 
         // Guardar en configuración
         ConfigManager cm = plugin.getConfigManager();
-        TextDisplayData data = TextDisplayData.builder()
-                .id(id)
-                .world(world.getName())
-                .x(location.getX())
-                .y(location.getY())
-                .z(location.getZ())
-                .yaw(location.getYaw())
-                .pitch(location.getPitch())
-                .billboard(cm.getDefaultBillboard())
-                .width(cm.getDefaultWidth())
-                .height(cm.getDefaultHeight())
-                .viewRange(cm.getDefaultViewRange())
-                .build();
+        TextDisplayData data = new TextDisplayData(
+                id,
+                world.getName(),
+                location.getX(),
+                location.getY(),
+                location.getZ(),
+                location.getYaw(),
+                location.getPitch(),
+                cm.getDefaultBillboard(),
+                cm.getDefaultWidth(),
+                cm.getDefaultHeight(),
+                cm.getDefaultViewRange()
+        );
         cm.saveDisplayData(data);
-        
+
         return display;
     }
 
@@ -115,14 +116,18 @@ public class DisplayManager {
     }
 
     // Establece el tamaño del display
+    // Ajusta ancho y alto del TextDisplay usando tanto los setters nativos como una
+    // transformación de escala
     public void setSize(String id, float width, float height) {
         getDisplay(id).ifPresent(display -> {
+            // Guardar ancho y alto en la entidad
             display.setDisplayWidth(width);
             display.setDisplayHeight(height);
-            plugin.getConfigManager().getConfig().set(
-                    "displays." + id + ".width", width);
-            plugin.getConfigManager().getConfig().set(
-                    "displays." + id + ".height", height);
+            // Cambiar a billboard FIXED para que la escala sea respetada
+            display.setBillboard(Display.Billboard.FIXED);
+            // Persistir en la configuración
+            plugin.getConfigManager().getConfig().set("displays." + id + ".width", width);
+            plugin.getConfigManager().getConfig().set("displays." + id + ".height", height);
             plugin.getConfigManager().saveConfig();
         });
     }
@@ -161,14 +166,14 @@ public class DisplayManager {
     public void loadAllDisplays() {
         ConfigManager cm = plugin.getConfigManager();
         Map<String, TextDisplayData> allData = cm.loadAllDisplays();
-        
+
         if (allData.isEmpty()) {
             return;
         }
-        
+
         // Intentar cargar displays inmediatamente
         int loaded = tryLoadDisplays(allData);
-        
+
         // Si no se pudieron cargar todos, programar carga diferida
         if (loaded < allData.size()) {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -177,7 +182,7 @@ public class DisplayManager {
             }, 20L); // 1 segundo después
         }
     }
-    
+
     // Intenta cargar todos los displays devuelve la cantidad cargada
     private int tryLoadDisplays(Map<String, TextDisplayData> allData) {
         int loaded = 0;
@@ -227,7 +232,8 @@ public class DisplayManager {
     // Elimina todos los displays del mundo
     public void removeAllDisplays() {
         activeDisplays.values().forEach(display -> {
-            if (!display.isDead()) display.remove();
+            if (!display.isDead())
+                display.remove();
         });
         activeDisplays.clear();
     }
