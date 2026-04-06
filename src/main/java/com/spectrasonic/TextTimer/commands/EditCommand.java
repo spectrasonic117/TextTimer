@@ -77,20 +77,23 @@ public class EditCommand {
             sendUsage(plugin, player, "commands.edit.size.usage");
             return;
         }
-        Map<String, Double> dims = parseAxisValues(value, "xy");
-        if (dims.isEmpty()) {
+        // Parsear ancho y altura separados por espacio
+        String[] parts = value.trim().split("\\s+");
+        if (parts.length < 2) {
             sendInvalidValue(plugin, player, "size", value);
             return;
         }
-        // Obtener dimensiones actuales si no se especifican en el parámetro
-        float currentWidth = plugin.getDisplayManager().getDisplay(id)
-                .map(d -> d.getDisplayWidth())
-                .orElse(plugin.getConfigManager().getDefaultWidth());
-        float currentHeight = plugin.getDisplayManager().getDisplay(id)
-                .map(d -> d.getDisplayHeight())
-                .orElse(plugin.getConfigManager().getDefaultHeight());
-        float width = dims.containsKey("x") ? dims.get("x").floatValue() : currentWidth;
-        float height = dims.containsKey("y") ? dims.get("y").floatValue() : currentHeight;
+        double widthVal;
+        double heightVal;
+        try {
+            widthVal = Double.parseDouble(parts[0]);
+            heightVal = Double.parseDouble(parts[1]);
+        } catch (NumberFormatException e) {
+            sendInvalidValue(plugin, player, "size", value);
+            return;
+        }
+        float width = (float) widthVal;
+        float height = (float) heightVal;
         plugin.getDisplayManager().setSize(id, width, height);
         sendSuccess(plugin, player, id, "size");
     }
