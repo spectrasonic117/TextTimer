@@ -44,7 +44,10 @@ public class DisplayManager {
         Entity entity = world.spawnEntity(location, EntityType.TEXT_DISPLAY);
         TextDisplay display = (TextDisplay) entity;
         applyDefaultSettings(display);
-        display.text(MiniMessage.miniMessage().deserialize(""));
+        
+        // Establecer texto inicial usando el formato de timer configurado
+        String defaultText = plugin.getConfigManager().getTimerFormat().replace("{timer}", "00:00");
+        display.text(MiniMessage.miniMessage().deserialize(defaultText));
 
         // Etiquetar con PersistentDataContainer para identificarlo
         display.getPersistentDataContainer().set(displayKey, PersistentDataType.STRING, id);

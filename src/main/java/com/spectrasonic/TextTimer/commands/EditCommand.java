@@ -4,6 +4,7 @@ import com.spectrasonic.TextTimer.Main;
 import com.spectrasonic.Utils.MessageUtils;
 
 import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import org.bukkit.entity.Player;
 import org.bukkit.command.CommandSender;
 
@@ -11,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.bukkit.entity.Display.Billboard;
 
 // Comando /tt edit <id> <param> <value> - Edita parámetros de un display
 public class EditCommand {
@@ -60,7 +63,7 @@ public class EditCommand {
             return;
         }
         try {
-            org.bukkit.entity.Display.Billboard billboard = org.bukkit.entity.Display.Billboard
+            Billboard billboard = Billboard
                     .valueOf(value.toUpperCase());
             plugin.getDisplayManager().setBillboard(id, billboard);
             sendSuccess(plugin, player, id, "billboard");
@@ -79,8 +82,15 @@ public class EditCommand {
             sendInvalidValue(plugin, player, "size", value);
             return;
         }
-        float width = dims.getOrDefault("x", 0.0).floatValue();
-        float height = dims.getOrDefault("y", 0.0).floatValue();
+        // Obtener dimensiones actuales si no se especifican en el parámetro
+        float currentWidth = plugin.getDisplayManager().getDisplay(id)
+                .map(d -> d.getDisplayWidth())
+                .orElse(plugin.getConfigManager().getDefaultWidth());
+        float currentHeight = plugin.getDisplayManager().getDisplay(id)
+                .map(d -> d.getDisplayHeight())
+                .orElse(plugin.getConfigManager().getDefaultHeight());
+        float width = dims.containsKey("x") ? dims.get("x").floatValue() : currentWidth;
+        float height = dims.containsKey("y") ? dims.get("y").floatValue() : currentHeight;
         plugin.getDisplayManager().setSize(id, width, height);
         sendSuccess(plugin, player, id, "size");
     }
@@ -134,7 +144,7 @@ public class EditCommand {
     // Argumento con sugerencias de IDs existentes
     static StringArgument createIdArgument(Main plugin) {
         return (StringArgument) new StringArgument("id")
-                .replaceSuggestions(dev.jorel.commandapi.arguments.ArgumentSuggestions.strings(
+                .replaceSuggestions(ArgumentSuggestions.strings(
                         info -> plugin.getDisplayManager().getDisplayIds().toArray(new String[0])));
     }
 

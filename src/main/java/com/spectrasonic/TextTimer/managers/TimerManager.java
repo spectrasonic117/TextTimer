@@ -128,14 +128,12 @@ public TimerManager(Main plugin) {
         return totalSeconds;
     }
 
-    // Formatea segundos a "MM:SS" o "SS"
+    // Formatea segundos a "MM:SS" o "00:SS"
     public static String formatTime(int totalSeconds) {
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
-        if (minutes > 0) {
-            return String.format("%02d:%02d", minutes, seconds);
-        }
-        return String.format("%02d", seconds);
+        // Siempre mostrar en formato MM:SS
+        return String.format("%02d:%02d", minutes, seconds);
     }
 
     // Reproduce sonido de inicio a todos los jugadores

@@ -4,7 +4,6 @@ import com.spectrasonic.TextTimer.Main;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
-import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.executors.CommandArguments;
 import org.bukkit.command.CommandSender;
@@ -29,7 +28,14 @@ public class TextTimerCommand {
                         .withArguments(EditCommand.createIdArgument(plugin))
                         .withArguments(new StringArgument("param")
                                 .replaceSuggestions(ArgumentSuggestions.strings("move", "billboard", "size", "rotation", "render")))
-                        .withArguments(new GreedyStringArgument("value"))
+                        .withArguments(new StringArgument("value")
+                                .replaceSuggestions(ArgumentSuggestions.strings(info -> {
+                                    String param = (String) info.previousArgs().get("param");
+                                    if (param != null && param.equalsIgnoreCase("billboard")) {
+                                        return new String[]{"FIXED", "VERTICAL", "HORIZONTAL", "CENTER"};
+                                    }
+                                    return new String[0];
+                                })))
                         .withPermission(CommandPermission.OP)
                         .executesPlayer((Player player, CommandArguments args) -> {
                             String id = (String) args.get("id");
