@@ -153,4 +153,9 @@ public class ConfigManager {
         }
         return map;
     }
+    
+    // Proporciona acceso directo al FileConfiguration para ediciones directas
+    public FileConfiguration getConfig() {
+        return config;
+    }
 }

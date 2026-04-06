@@ -51,7 +51,7 @@ timer:
   # Sonido al iniciar el timer (nombre del sonido de Bukkit)
   start-sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
   # Sonido al finalizar el timer
-  end-sound: "ENTITY_WITHER_DEATH"
+  end-sound: "BLOCK_NOTE_BLOCK_COW_BELL"
   # Texto a mostrar cuando el timer llega a cero
   end-text: "<red>00:00</red>"
 

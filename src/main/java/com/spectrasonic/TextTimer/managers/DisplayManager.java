@@ -161,6 +161,26 @@ public class DisplayManager {
     public void loadAllDisplays() {
         ConfigManager cm = plugin.getConfigManager();
         Map<String, TextDisplayData> allData = cm.loadAllDisplays();
+        
+        if (allData.isEmpty()) {
+            return;
+        }
+        
+        // Intentar cargar displays inmediatamente
+        int loaded = tryLoadDisplays(allData);
+        
+        // Si no se pudieron cargar todos, programar carga diferida
+        if (loaded < allData.size()) {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                int retryLoaded = tryLoadDisplays(allData);
+                PluginLogger.info("Cargados " + retryLoaded + " displays en retry.");
+            }, 20L); // 1 segundo después
+        }
+    }
+    
+    // Intenta cargar todos los displays devuelve la cantidad cargada
+    private int tryLoadDisplays(Map<String, TextDisplayData> allData) {
+        int loaded = 0;
         for (Map.Entry<String, TextDisplayData> entry : allData.entrySet()) {
             TextDisplayData data = entry.getValue();
             World world = Bukkit.getWorld(data.getWorld());
@@ -169,11 +189,21 @@ public class DisplayManager {
                         "Mundo no encontrado para display '" + data.getId() + "': " + data.getWorld());
                 continue;
             }
+            // Solo cargar si el mundo está completamente cargado
+            if (!world.isChunkLoaded((int) data.getX() >> 4, (int) data.getZ() >> 4)) {
+                if (!world.loadChunk((int) data.getX() >> 4, (int) data.getZ() >> 4, true)) {
+                    PluginLogger.warning(
+                            "No se pudo cargar el chunk para display '" + data.getId() + "'");
+                    continue;
+                }
+            }
             Location loc = new Location(world, data.getX(), data.getY(), data.getZ(),
                     data.getYaw(), data.getPitch());
             spawnFromData(data, loc);
+            loaded++;
         }
-        PluginLogger.info("Cargados " + activeDisplays.size() + " displays.");
+        PluginLogger.info("Cargados " + loaded + " displays.");
+        return loaded;
     }
 
     // Actualiza todos los displays con datos de config (para reload)
@@ -209,6 +239,11 @@ public class DisplayManager {
 
     public boolean hasDisplay(String id) {
         return activeDisplays.containsKey(id);
+    }
+
+    // Añade un display al mapa interno (para uso del listener)
+    public void addDisplay(String id, TextDisplay display) {
+        activeDisplays.put(id, display);
     }
 
     // --- Métodos privados ---
