@@ -15,6 +15,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 
 import java.util.Collections;
@@ -115,16 +118,22 @@ public class DisplayManager {
         });
     }
 
-    // Establece el tamaño del display
-    // Ajusta ancho y alto del TextDisplay usando tanto los setters nativos como una
-    // transformación de escala
+    // Establece el tamaño del display usando Transformation para un control preciso de escala
     public void setSize(String id, float width, float height) {
         getDisplay(id).ifPresent(display -> {
-            // Guardar ancho y alto en la entidad
-            display.setDisplayWidth(width);
-            display.setDisplayHeight(height);
-            // Cambiar a billboard FIXED para que la escala sea respetada
+            // Cambiar a billboard FIXED para que la escala sea respetada por el cliente
             display.setBillboard(Display.Billboard.FIXED);
+
+            // Crear transformación de escala: translation=0, sin rotación, scale=(width, height, 1)
+            // Se usa AxisAngle4f con ángulo 0 para representar "sin rotación"
+            Transformation scale = new Transformation(
+                    new Vector3f(0, 0, 0),
+                    new AxisAngle4f(0, 0, 0, 0),
+                    new Vector3f(width, height, 1f),
+                    new AxisAngle4f(0, 0, 0, 0)
+            );
+            display.setTransformation(scale);
+
             // Persistir en la configuración
             plugin.getConfigManager().getConfig().set("displays." + id + ".width", width);
             plugin.getConfigManager().getConfig().set("displays." + id + ".height", height);
