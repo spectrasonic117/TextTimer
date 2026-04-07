@@ -84,14 +84,35 @@ public class DisplayManager {
         plugin.getConfigManager().removeDisplay(id);
     }
 
-    // Obtiene un display por su ID
+    // Obtiene un display por su ID, busca en mundo si no está en memoria
     public Optional<TextDisplay> getDisplay(String id) {
         TextDisplay display = activeDisplays.get(id);
-        if (display == null || !display.isValid() || display.isDead()) {
-            activeDisplays.remove(id);
-            return Optional.empty();
+        if (display != null && display.isValid() && !display.isDead()) {
+            return Optional.of(display);
         }
-        return Optional.of(display);
+        
+        // Si no está en el mapa, buscar en el mundo
+        activeDisplays.remove(id);
+        return findDisplayInWorld(id);
+    }
+
+    // Busca un display existente en el mundo por su ID en el PDC
+    private Optional<TextDisplay> findDisplayInWorld(String id) {
+        TextDisplayData data = plugin.getConfigManager().getDisplayData(id);
+        if (data == null) return Optional.empty();
+        
+        World world = Bukkit.getWorld(data.getWorld());
+        if (world == null) return Optional.empty();
+        
+        for (TextDisplay display : world.getEntitiesByClass(TextDisplay.class)) {
+            String storedId = display.getPersistentDataContainer().get(displayKey, PersistentDataType.STRING);
+            if (id.equals(storedId)) {
+                activeDisplays.put(id, display);
+                PluginLogger.info("Display '" + id + "' encontrado y cargado desde el mundo.");
+                return Optional.of(display);
+            }
+        }
+        return Optional.empty();
     }
 
     // Teletransporta un display a una ubicación
@@ -261,13 +282,35 @@ public class DisplayManager {
         activeDisplays.clear();
     }
 
-    // Obtener IDs de displays activos
+    // Obtener IDs de displays (incluye los encontrados en el mundo)
     public Set<String> getDisplayIds() {
-        return Collections.unmodifiableSet(activeDisplays.keySet());
+        Set<String> ids = new java.util.HashSet<>(activeDisplays.keySet());
+        
+        // Agregar displays que están en config pero no en memoria
+        for (String id : plugin.getConfigManager().getDisplayIds()) {
+            if (!ids.contains(id)) {
+                // Intentar encontrar en mundo
+                if (findDisplayInWorld(id).isPresent()) {
+                    ids.add(id);
+                }
+            }
+        }
+        return ids;
     }
 
     public boolean hasDisplay(String id) {
-        return activeDisplays.containsKey(id);
+        if (activeDisplays.containsKey(id)) {
+            TextDisplay display = activeDisplays.get(id);
+            if (display != null && display.isValid() && !display.isDead()) {
+                return true;
+            }
+            activeDisplays.remove(id);
+        }
+        // Verificar si existe en configuración y buscar en el mundo
+        if (plugin.getConfigManager().hasDisplay(id)) {
+            return findDisplayInWorld(id).isPresent();
+        }
+        return false;
     }
 
     // Añade un display al mapa interno (para uso del listener)
