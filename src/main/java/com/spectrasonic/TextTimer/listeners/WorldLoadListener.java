@@ -7,8 +7,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -56,21 +54,22 @@ public class WorldLoadListener implements Listener {
                 Location loc = new Location(world, data.getX(), data.getY(), data.getZ(),
                         data.getYaw(), data.getPitch());
 
-                // Spawn del display
-                Entity entity = world.spawnEntity(loc, EntityType.TEXT_DISPLAY);
-                TextDisplay display = (TextDisplay) entity;
+                // Spawn del display usando spawn() con callback
+                world.spawn(loc, TextDisplay.class, display -> {
+                    applyDefaultSettings(display);
+                    display.setBillboard(Display.Billboard.valueOf(data.getBillboard()));
+                    display.setDisplayWidth(data.getWidth());
+                    display.setDisplayHeight(data.getHeight());
+                    display.setViewRange(data.getViewRange());
+                    display.text(MiniMessage.miniMessage().deserialize(""));
+                    display.getPersistentDataContainer().set(displayKey, PersistentDataType.STRING, data.getId());
+                    // Forzar actualización inmediata al cliente
+                    display.setInterpolationDelay(0);
+                    display.setInterpolationDuration(0);
 
-                // Aplicar configuración
-                applyDefaultSettings(display);
-                display.setBillboard(Display.Billboard.valueOf(data.getBillboard()));
-                display.setDisplayWidth(data.getWidth());
-                display.setDisplayHeight(data.getHeight());
-                display.setViewRange(data.getViewRange());
-                display.text(MiniMessage.miniMessage().deserialize(""));
-                display.getPersistentDataContainer().set(displayKey, PersistentDataType.STRING, data.getId());
-
-                plugin.getDisplayManager().addDisplay(id, display);
-                PluginLogger.info("Display '" + id + "' cargado con el mundo.");
+                    plugin.getDisplayManager().addDisplay(id, display);
+                    PluginLogger.info("Display '" + id + "' cargado con el mundo.");
+                });
             }
         }
     }

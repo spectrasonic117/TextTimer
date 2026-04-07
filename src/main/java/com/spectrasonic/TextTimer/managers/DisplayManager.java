@@ -11,8 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
@@ -45,16 +43,16 @@ public class DisplayManager {
         if (world == null)
             return null;
 
-        Entity entity = world.spawnEntity(location, EntityType.TEXT_DISPLAY);
-        TextDisplay display = (TextDisplay) entity;
-        applyDefaultSettings(display);
+        // Usar spawn() con callback para mejor compatibilidad con el cliente
+        TextDisplay display = world.spawn(location, TextDisplay.class, entity -> {
+            applyDefaultSettings(entity);
+            String defaultText = plugin.getConfigManager().getTimerFormat().replace("{timer}", "00:00");
+            entity.text(MiniMessage.miniMessage().deserialize(defaultText));
+            entity.getPersistentDataContainer().set(displayKey, PersistentDataType.STRING, id);
+            entity.setInterpolationDelay(0);
+            entity.setInterpolationDuration(0);
+        });
 
-        // Establecer texto inicial usando el formato de timer configurado
-        String defaultText = plugin.getConfigManager().getTimerFormat().replace("{timer}", "00:00");
-        display.text(MiniMessage.miniMessage().deserialize(defaultText));
-
-        // Etiquetar con PersistentDataContainer para identificarlo
-        display.getPersistentDataContainer().set(displayKey, PersistentDataType.STRING, id);
         activeDisplays.put(id, display);
 
         // Guardar en configuración
@@ -88,13 +86,19 @@ public class DisplayManager {
 
     // Obtiene un display por su ID
     public Optional<TextDisplay> getDisplay(String id) {
-        return Optional.ofNullable(activeDisplays.get(id));
+        TextDisplay display = activeDisplays.get(id);
+        if (display == null || !display.isValid() || display.isDead()) {
+            activeDisplays.remove(id);
+            return Optional.empty();
+        }
+        return Optional.of(display);
     }
 
     // Teletransporta un display a una ubicación
     public void teleportDisplay(String id, Location location) {
         getDisplay(id).ifPresent(display -> {
             display.teleport(location);
+            forceClientUpdate(display);
             updateConfigLocation(id, location);
         });
     }
@@ -104,6 +108,7 @@ public class DisplayManager {
         getDisplay(id).ifPresent(display -> {
             Location loc = display.getLocation().add(dx, dy, dz);
             display.teleport(loc);
+            forceClientUpdate(display);
             updateConfigLocation(id, loc);
         });
     }
@@ -112,6 +117,7 @@ public class DisplayManager {
     public void setBillboard(String id, Display.Billboard billboard) {
         getDisplay(id).ifPresent(display -> {
             display.setBillboard(billboard);
+            forceClientUpdate(display);
             plugin.getConfigManager().getConfig().set(
                     "displays." + id + ".billboard", billboard.name());
             plugin.getConfigManager().saveConfig();
@@ -121,11 +127,8 @@ public class DisplayManager {
     // Establece el tamaño del display usando Transformation para un control preciso de escala
     public void setSize(String id, float width, float height) {
         getDisplay(id).ifPresent(display -> {
-            // Cambiar a billboard FIXED para que la escala sea respetada por el cliente
             display.setBillboard(Display.Billboard.FIXED);
 
-            // Crear transformación de escala: translation=0, sin rotación, scale=(width, height, 1)
-            // Se usa AxisAngle4f con ángulo 0 para representar "sin rotación"
             Transformation scale = new Transformation(
                     new Vector3f(0, 0, 0),
                     new AxisAngle4f(0, 0, 0, 0),
@@ -133,8 +136,8 @@ public class DisplayManager {
                     new AxisAngle4f(0, 0, 0, 0)
             );
             display.setTransformation(scale);
+            forceClientUpdate(display);
 
-            // Persistir en la configuración
             plugin.getConfigManager().getConfig().set("displays." + id + ".width", width);
             plugin.getConfigManager().getConfig().set("displays." + id + ".height", height);
             plugin.getConfigManager().saveConfig();
@@ -148,6 +151,7 @@ public class DisplayManager {
             loc.setYaw(yaw);
             loc.setPitch(pitch);
             display.teleport(loc);
+            forceClientUpdate(display);
             plugin.getConfigManager().getConfig().set(
                     "displays." + id + ".yaw", yaw);
             plugin.getConfigManager().getConfig().set(
@@ -160,6 +164,7 @@ public class DisplayManager {
     public void setViewRange(String id, float range) {
         getDisplay(id).ifPresent(display -> {
             display.setViewRange(range);
+            forceClientUpdate(display);
             plugin.getConfigManager().getConfig().set(
                     "displays." + id + ".view-range", range);
             plugin.getConfigManager().saveConfig();
@@ -168,7 +173,16 @@ public class DisplayManager {
 
     // Actualiza el texto de todos los displays activos
     public void updateAllDisplaysText(net.kyori.adventure.text.Component text) {
-        activeDisplays.values().forEach(display -> display.text(text));
+        activeDisplays.values().forEach(display -> {
+            display.text(text);
+            forceClientUpdate(display);
+        });
+    }
+
+    // Forza actualización inmediata al cliente
+    private void forceClientUpdate(TextDisplay display) {
+        display.setInterpolationDelay(0);
+        display.setInterpolationDuration(0);
     }
 
     // Carga todos los displays desde la configuración al iniciar
@@ -302,16 +316,24 @@ public class DisplayManager {
     // Spawnea un display desde datos de configuración
     private void spawnFromData(TextDisplayData data, Location loc) {
         World world = loc.getWorld();
-        Entity entity = world.spawnEntity(loc, EntityType.TEXT_DISPLAY);
-        TextDisplay display = (TextDisplay) entity;
-        applyDefaultSettings(display);
+        // Usar spawn() con callback para mejor compatibilidad con el cliente
+        TextDisplay display = world.spawn(loc, TextDisplay.class, entity -> {
+            applyDefaultSettingsDisplay(entity, data);
+            entity.getPersistentDataContainer().set(displayKey, PersistentDataType.STRING, data.getId());
+        });
+        activeDisplays.put(data.getId(), display);
+    }
+
+    // Aplica settings desde TextDisplayData
+    private void applyDefaultSettingsDisplay(TextDisplay display, TextDisplayData data) {
         display.setBillboard(Display.Billboard.valueOf(data.getBillboard()));
         display.setDisplayWidth(data.getWidth());
         display.setDisplayHeight(data.getHeight());
         display.setViewRange(data.getViewRange());
         display.text(MiniMessage.miniMessage().deserialize(""));
-        display.getPersistentDataContainer().set(displayKey, PersistentDataType.STRING, data.getId());
-        activeDisplays.put(data.getId(), display);
+        // Forzar actualización inmediata al cliente
+        display.setInterpolationDelay(0);
+        display.setInterpolationDuration(0);
     }
 
     // Actualiza un display existente con datos frescos de config
